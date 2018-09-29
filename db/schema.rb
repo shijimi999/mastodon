@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_20_232245) do
+ActiveRecord::Schema.define(version: 2018_09_29_222014) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -126,6 +126,17 @@ ActiveRecord::Schema.define(version: 2018_08_20_232245) do
     t.index ["target_account_id"], name: "index_blocks_on_target_account_id"
   end
 
+  create_table "conversation_accounts", force: :cascade do |t|
+    t.bigint "account_id"
+    t.bigint "conversation_id"
+    t.bigint "participant_account_ids", default: [], null: false, array: true
+    t.bigint "last_status_id"
+    t.index ["account_id", "conversation_id", "participant_account_ids"], name: "index_unique_conversations", unique: true
+    t.index ["account_id"], name: "index_conversation_accounts_on_account_id"
+    t.index ["conversation_id"], name: "index_conversation_accounts_on_conversation_id"
+    t.index ["last_status_id"], name: "index_conversation_accounts_on_last_status_id"
+  end
+
   create_table "conversation_mutes", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.bigint "account_id", null: false
@@ -161,9 +172,9 @@ ActiveRecord::Schema.define(version: 2018_08_20_232245) do
     t.text "phrase", default: "", null: false
     t.string "context", default: [], null: false, array: true
     t.boolean "irreversible", default: false, null: false
+    t.boolean "whole_word", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "whole_word", default: true, null: false
     t.index ["account_id"], name: "index_custom_filters_on_account_id"
   end
 
@@ -173,6 +184,7 @@ ActiveRecord::Schema.define(version: 2018_08_20_232245) do
     t.datetime "updated_at", null: false
     t.integer "severity", default: 0
     t.boolean "reject_media", default: false, null: false
+    t.boolean "reject_reports", default: false, null: false
     t.index ["domain"], name: "index_domain_blocks_on_domain", unique: true
   end
 
@@ -608,6 +620,9 @@ ActiveRecord::Schema.define(version: 2018_08_20_232245) do
   add_foreign_key "backups", "users", on_delete: :nullify
   add_foreign_key "blocks", "accounts", column: "target_account_id", name: "fk_9571bfabc1", on_delete: :cascade
   add_foreign_key "blocks", "accounts", name: "fk_4269e03e65", on_delete: :cascade
+  add_foreign_key "conversation_accounts", "accounts", on_delete: :cascade
+  add_foreign_key "conversation_accounts", "conversations", on_delete: :cascade
+  add_foreign_key "conversation_accounts", "statuses", column: "last_status_id", on_delete: :nullify
   add_foreign_key "conversation_mutes", "accounts", name: "fk_225b4212bb", on_delete: :cascade
   add_foreign_key "conversation_mutes", "conversations", on_delete: :cascade
   add_foreign_key "custom_filters", "accounts", on_delete: :cascade
