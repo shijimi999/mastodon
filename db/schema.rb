@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_20_232245) do
+ActiveRecord::Schema.define(version: 2018_09_29_170937) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -161,9 +161,9 @@ ActiveRecord::Schema.define(version: 2018_08_20_232245) do
     t.text "phrase", default: "", null: false
     t.string "context", default: [], null: false, array: true
     t.boolean "irreversible", default: false, null: false
+    t.boolean "whole_word", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "whole_word", default: true, null: false
     t.index ["account_id"], name: "index_custom_filters_on_account_id"
   end
 
@@ -173,6 +173,7 @@ ActiveRecord::Schema.define(version: 2018_08_20_232245) do
     t.datetime "updated_at", null: false
     t.integer "severity", default: 0
     t.boolean "reject_media", default: false, null: false
+    t.boolean "reject_reports", default: false, null: false
     t.index ["domain"], name: "index_domain_blocks_on_domain", unique: true
   end
 
